@@ -1,0 +1,1 @@
+web: java -jar target/servicio-agil-v1-1.0.0.jar --server.port=$PORT

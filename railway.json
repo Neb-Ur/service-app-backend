@@ -1,0 +1,12 @@
+{
+  "build": {
+    "commands": [
+      "mvn clean package -DskipTests"
+    ]
+  },
+  "deploy": {
+    "startCommand": "java -jar target/servicio-agil-v1-1.0.0.jar --server.port=$PORT",
+    "healthcheckPath": "/api/health",
+    "healthcheckTimeout": 300
+  }
+}

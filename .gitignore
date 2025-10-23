@@ -1,0 +1,40 @@
+# Archivos de dependencias de Maven
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# Archivos de IDE
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/
+*.swp
+*.swo
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos de logs
+*.log
+logs/
+
+# Archivos temporales
+*.tmp
+*.temp
+
+# Archivos de configuración local
+application-local.properties
+application-dev.properties
+
+# Archivos de base de datos H2
+*.db
+*.trace.db
+*.lock.db
+
+# Archivos de cobertura de tests
+target/site/jacoco/
+*.exec
+
+# Archivos de Spring Boot
+spring-boot-devtools.properties
