@@ -27,6 +27,9 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     // Buscar usuarios inactivos
     List<Usuario> findByActivoFalse();
+    
+    // Buscar usuarios por tipo
+    List<Usuario> findByTipoUsuario(Usuario.TipoUsuario tipoUsuario);
 
     // Buscar usuarios por nombre (ignorando mayúsculas/minúsculas)
     @Query("SELECT u FROM Usuario u WHERE LOWER(u.nombre) LIKE LOWER(CONCAT('%', :nombre, '%'))")
@@ -37,4 +40,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     // Contar usuarios inactivos
     long countByActivoFalse();
+    
+    // Contar usuarios por tipo
+    long countByTipoUsuario(Usuario.TipoUsuario tipoUsuario);
 }

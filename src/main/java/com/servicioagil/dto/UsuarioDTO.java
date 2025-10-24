@@ -2,9 +2,9 @@ package com.servicioagil.dto;
 
 import java.time.LocalDateTime;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.servicioagil.entity.Usuario;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,18 +13,34 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UsuarioDTO {
-
+    
     private Long id;
-
-    @NotBlank(message = "El nombre es obligatorio")
-    @Size(min = 2, max = 100, message = "El nombre debe tener entre 2 y 100 caracteres")
     private String nombre;
-
-    @NotBlank(message = "El email es obligatorio")
-    @Email(message = "El email debe tener un formato válido")
+    private String apellido;
     private String email;
-
+    private String telefono;
+    private String direccion;
+    
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime fechaNacimiento;
+    
+    private Usuario.TipoUsuario tipoUsuario;
     private Boolean activo;
+    
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime fechaCreacion;
+    
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime fechaActualizacion;
+    
+    // Información adicional según el tipo de usuario
+    private Long empresaId;
+    private String empresaNombre;
+    private Long tecnicoId;
+    private Integer tecnicoClasificacion;
+    private Double tecnicoRating;
+    
+    // Estadísticas
+    private Long totalSolicitudes;
+    private Long totalResenasEscritas;
 }

@@ -32,7 +32,7 @@ public class UsuarioService {
         log.info("Obteniendo todos los usuarios");
         List<Usuario> usuarios = usuarioRepository.findAll();
         return usuarios.stream()
-                .map(usuario -> modelMapper.map(usuario, UsuarioDTO.class))
+                .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
@@ -41,7 +41,7 @@ public class UsuarioService {
         log.info("Obteniendo usuario con ID: {}", id);
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con ID: " + id));
-        return modelMapper.map(usuario, UsuarioDTO.class);
+        return convertToDTO(usuario);
     }
 
     @Transactional(readOnly = true)
@@ -49,7 +49,16 @@ public class UsuarioService {
         log.info("Obteniendo usuarios activos");
         List<Usuario> usuarios = usuarioRepository.findByActivoTrue();
         return usuarios.stream()
-                .map(usuario -> modelMapper.map(usuario, UsuarioDTO.class))
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+    
+    @Transactional(readOnly = true)
+    public List<UsuarioDTO> obtenerUsuariosPorTipo(Usuario.TipoUsuario tipoUsuario) {
+        log.info("Obteniendo usuarios por tipo: {}", tipoUsuario);
+        List<Usuario> usuarios = usuarioRepository.findByTipoUsuario(tipoUsuario);
+        return usuarios.stream()
+                .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
@@ -58,8 +67,16 @@ public class UsuarioService {
         log.info("Buscando usuarios por nombre: {}", nombre);
         List<Usuario> usuarios = usuarioRepository.findByNombreContainingIgnoreCase(nombre);
         return usuarios.stream()
-                .map(usuario -> modelMapper.map(usuario, UsuarioDTO.class))
+                .map(this::convertToDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public UsuarioDTO buscarUsuarioPorEmail(String email) {
+        log.info("Buscando usuario por email: {}", email);
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con email: " + email));
+        return convertToDTO(usuario);
     }
 
     public UsuarioDTO crearUsuario(CreateUsuarioDTO createUsuarioDTO) {
@@ -74,7 +91,7 @@ public class UsuarioService {
         Usuario usuarioGuardado = usuarioRepository.save(usuario);
         
         log.info("Usuario creado exitosamente con ID: {}", usuarioGuardado.getId());
-        return modelMapper.map(usuarioGuardado, UsuarioDTO.class);
+        return convertToDTO(usuarioGuardado);
     }
 
     public UsuarioDTO actualizarUsuario(Long id, UpdateUsuarioDTO updateUsuarioDTO) {
@@ -93,8 +110,20 @@ public class UsuarioService {
         if (updateUsuarioDTO.getNombre() != null) {
             usuario.setNombre(updateUsuarioDTO.getNombre());
         }
+        if (updateUsuarioDTO.getApellido() != null) {
+            usuario.setApellido(updateUsuarioDTO.getApellido());
+        }
         if (updateUsuarioDTO.getEmail() != null) {
             usuario.setEmail(updateUsuarioDTO.getEmail());
+        }
+        if (updateUsuarioDTO.getTelefono() != null) {
+            usuario.setTelefono(updateUsuarioDTO.getTelefono());
+        }
+        if (updateUsuarioDTO.getDireccion() != null) {
+            usuario.setDireccion(updateUsuarioDTO.getDireccion());
+        }
+        if (updateUsuarioDTO.getFechaNacimiento() != null) {
+            usuario.setFechaNacimiento(updateUsuarioDTO.getFechaNacimiento());
         }
         if (updateUsuarioDTO.getActivo() != null) {
             usuario.setActivo(updateUsuarioDTO.getActivo());
@@ -103,7 +132,7 @@ public class UsuarioService {
         Usuario usuarioActualizado = usuarioRepository.save(usuario);
         
         log.info("Usuario actualizado exitosamente con ID: {}", usuarioActualizado.getId());
-        return modelMapper.map(usuarioActualizado, UsuarioDTO.class);
+        return convertToDTO(usuarioActualizado);
     }
 
     public void eliminarUsuario(Long id) {
@@ -124,5 +153,15 @@ public class UsuarioService {
     @Transactional(readOnly = true)
     public long contarUsuariosInactivos() {
         return usuarioRepository.countByActivoFalse();
+    }
+
+    @Transactional(readOnly = true)
+    public long contarUsuariosPorTipo(Usuario.TipoUsuario tipoUsuario) {
+        return usuarioRepository.countByTipoUsuario(tipoUsuario);
+    }
+
+    private UsuarioDTO convertToDTO(Usuario usuario) {
+        UsuarioDTO dto = modelMapper.map(usuario, UsuarioDTO.class);
+        return dto;
     }
 }

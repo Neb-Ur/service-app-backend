@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.servicioagil.dto.CreateUsuarioDTO;
 import com.servicioagil.dto.UpdateUsuarioDTO;
 import com.servicioagil.dto.UsuarioDTO;
+import com.servicioagil.entity.Usuario;
 import com.servicioagil.service.UsuarioService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -187,17 +188,71 @@ public class UsuarioController {
         long usuariosActivos = usuarioService.contarUsuariosActivos();
         long usuariosInactivos = usuarioService.contarUsuariosInactivos();
         long totalUsuarios = usuariosActivos + usuariosInactivos;
+        long totalClientes = usuarioService.contarUsuariosPorTipo(Usuario.TipoUsuario.CLIENTE);
+        long totalTecnicos = usuarioService.contarUsuariosPorTipo(Usuario.TipoUsuario.TECNICO);
+        long totalEmpresas = usuarioService.contarUsuariosPorTipo(Usuario.TipoUsuario.EMPRESA);
         
         Map<String, Object> estadisticas = new HashMap<>();
         estadisticas.put("total", totalUsuarios);
         estadisticas.put("activos", usuariosActivos);
         estadisticas.put("inactivos", usuariosInactivos);
+        estadisticas.put("clientes", totalClientes);
+        estadisticas.put("tecnicos", totalTecnicos);
+        estadisticas.put("empresas", totalEmpresas);
         estadisticas.put("porcentajeActivos", totalUsuarios > 0 ? (usuariosActivos * 100.0 / totalUsuarios) : 0);
         
         Map<String, Object> response = new HashMap<>();
         response.put("success", true);
         response.put("data", estadisticas);
         response.put("message", "Estadísticas obtenidas exitosamente");
+        
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/tipo/{tipoUsuario}")
+    @Operation(summary = "Obtener usuarios por tipo", description = "Obtiene todos los usuarios de un tipo específico")
+    @ApiResponse(responseCode = "200", description = "Lista de usuarios obtenida exitosamente")
+    public ResponseEntity<Map<String, Object>> obtenerUsuariosPorTipo(
+            @Parameter(description = "Tipo de usuario (CLIENTE, TECNICO, EMPRESA)", required = true)
+            @PathVariable String tipoUsuario) {
+        log.info("GET /api/usuarios/tipo/{} - Obteniendo usuarios por tipo", tipoUsuario);
+        
+        try {
+            Usuario.TipoUsuario tipo = Usuario.TipoUsuario.valueOf(tipoUsuario.toUpperCase());
+            List<UsuarioDTO> usuarios = usuarioService.obtenerUsuariosPorTipo(tipo);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("data", usuarios);
+            response.put("count", usuarios.size());
+            response.put("message", "Usuarios obtenidos exitosamente");
+            
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "Tipo de usuario inválido: " + tipoUsuario + ". Tipos válidos: CLIENTE, TECNICO, EMPRESA");
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+    @GetMapping("/email/{email}")
+    @Operation(summary = "Buscar usuario por email", description = "Busca un usuario específico por su email")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Usuario encontrado"),
+        @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
+    })
+    public ResponseEntity<Map<String, Object>> obtenerUsuarioPorEmail(
+            @Parameter(description = "Email del usuario", required = true)
+            @PathVariable String email) {
+        log.info("GET /api/usuarios/email/{} - Obteniendo usuario por email", email);
+        
+        UsuarioDTO usuario = usuarioService.buscarUsuarioPorEmail(email);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("data", usuario);
+        response.put("message", "Usuario encontrado exitosamente");
         
         return ResponseEntity.ok(response);
     }
