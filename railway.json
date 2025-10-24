@@ -5,7 +5,7 @@
     ]
   },
   "deploy": {
-    "startCommand": "java -jar target/servicio-agil-v1-1.0.0.jar --server.port=$PORT",
+    "startCommand": "java -Dspring.profiles.active=railway -jar target/servicio-agil-v1-1.0.0.jar",
     "healthcheckPath": "/api/health",
     "healthcheckTimeout": 300
   }
