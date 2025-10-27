@@ -58,6 +58,12 @@ public class Usuario {
     @Size(max = 500, message = "La dirección no puede exceder los 500 caracteres")
     @Column(name = "direccion", length = 500)
     private String direccion;
+    
+    @Column(name = "latitude", precision = 10, scale = 8)
+    private Double latitude;
+    
+    @Column(name = "longitude", precision = 11, scale = 8)
+    private Double longitude;
 
     @Column(name = "fecha_nacimiento")
     private LocalDateTime fechaNacimiento;
@@ -85,7 +91,7 @@ public class Usuario {
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Resena> resenasEscritas = new ArrayList<>();
 
-    @Column(name = "fecha_creacion", nullable = false)
+    @Column(name = "fecha_creacion", nullable = true)
     private LocalDateTime fechaCreacion;
 
     @Column(name = "fecha_actualizacion")

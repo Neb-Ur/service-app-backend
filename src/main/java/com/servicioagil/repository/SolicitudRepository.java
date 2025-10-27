@@ -42,4 +42,15 @@ public interface SolicitudRepository extends JpaRepository<Solicitud, Long> {
     // Solicitudes urgentes sin asignar
     @Query("SELECT s FROM Solicitud s WHERE s.prioridad = 'URGENTE' AND s.tecnico IS NULL ORDER BY s.fechaCreacion ASC")
     List<Solicitud> findUrgentUnassigned();
+    
+    // Solicitudes por usuario
+    List<Solicitud> findByUsuarioId(Long usuarioId);
+    
+    // Solicitudes de emergencia activas
+    @Query("SELECT s FROM Solicitud s WHERE s.esUrgente = true AND s.estado = :estado")
+    List<Solicitud> findEmergenciasActivas(@Param("estado") Solicitud.EstadoSolicitud estado);
+    
+    // Solicitud por ID y usuario
+    @Query("SELECT s FROM Solicitud s WHERE s.id = :id AND s.usuario.id = :usuarioId")
+    Solicitud findByIdAndUsuarioId(@Param("id") Long id, @Param("usuarioId") Long usuarioId);
 }

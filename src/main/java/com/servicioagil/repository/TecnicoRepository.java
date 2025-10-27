@@ -32,10 +32,35 @@ public interface TecnicoRepository extends JpaRepository<Tecnico, Long> {
     @Query("SELECT t FROM Tecnico t JOIN t.subcategoria s WHERE s.id = :subcategoriaId")
     List<Tecnico> findBySubcategoriaId(@Param("subcategoriaId") Long subcategoriaId);
     
-    // Técnicos activos por subcategoría
-    @Query("SELECT t FROM Tecnico t JOIN t.subcategoria s WHERE s.id = :subcategoriaId AND t.activo = :activo")
-    List<Tecnico> findBySubcategoriaIdAndActivoTrue(@Param("subcategoriaId") Long subcategoriaId);
+    // Técnicos disponibles por subcategoría
+    @Query("SELECT t FROM Tecnico t WHERE t.subcategoria.id = :subcategoriaId " +
+           "AND t.disponible = true AND t.activo = true " +
+           "AND t.usuario.activo = true")
+    List<Tecnico> findTecnicosDisponiblesPorSubcategoria(@Param("subcategoriaId") Long subcategoriaId);
     
+    // Buscar técnicos cercanos usando coordenadas (Fórmula de Haversine)
+    @Query(value = "SELECT t.*, " +
+           "(6371 * acos(cos(radians(:lat)) * cos(radians(u.latitude)) " +
+           "* cos(radians(u.longitude) - radians(:lon)) " +
+           "+ sin(radians(:lat)) * sin(radians(u.latitude)))) AS distancia " +
+           "FROM tecnicos t " +
+           "INNER JOIN usuarios u ON t.usuario_id = u.id " +
+           "WHERE t.subcategoria_id = :subcategoriaId " +
+           "AND t.disponible = true " +
+           "AND t.activo = true " +
+           "AND u.activo = true " +
+           "AND u.latitude IS NOT NULL " +
+           "AND u.longitude IS NOT NULL " +
+           "HAVING distancia <= :radioKm " +
+           "ORDER BY distancia ASC",
+           nativeQuery = true)
+    List<Object[]> findTecnicosCercanos(
+        @Param("lat") Double latitud,
+        @Param("lon") Double longitud,
+        @Param("subcategoriaId") Long subcategoriaId,
+        @Param("radioKm") Double radioKm
+    );
+
     // Búsqueda con filtros
     @Query("SELECT DISTINCT t FROM Tecnico t LEFT JOIN t.subcategoria s WHERE " +
            "(:subcategoriaId IS NULL OR s.id = :subcategoriaId) AND " +

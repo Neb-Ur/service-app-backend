@@ -13,8 +13,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
@@ -95,7 +93,7 @@ public class Tecnico {
 
     // Relación con subcategoría (un técnico pertenece a una subcategoría)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "subcategoria_id", nullable = false)
+    @JoinColumn(name = "subcategoria_id", nullable = true)
     private Subcategoria subcategoria;
 
     // Relación con reseñas recibidas

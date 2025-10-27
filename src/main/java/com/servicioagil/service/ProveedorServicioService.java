@@ -1,5 +1,11 @@
 package com.servicioagil.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.servicioagil.dto.ProveedorServicioDTO;
 import com.servicioagil.entity.Empresa;
 import com.servicioagil.entity.Tecnico;
@@ -7,13 +13,9 @@ import com.servicioagil.exception.ResourceNotFoundException;
 import com.servicioagil.repository.EmpresaRepository;
 import com.servicioagil.repository.SubcategoriaRepository;
 import com.servicioagil.repository.TecnicoRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +38,7 @@ public class ProveedorServicioService {
         List<ProveedorServicioDTO> proveedores = new ArrayList<>();
 
         // Obtener técnicos independientes de la subcategoría
-        List<Tecnico> tecnicos = tecnicoRepository.findBySubcategoriaIdAndActivoTrue(subcategoriaId);
+        List<Tecnico> tecnicos = tecnicoRepository.findBySubcategoriaId(subcategoriaId);
         for (Tecnico tecnico : tecnicos) {
             // Solo agregar técnicos que no pertenecen a ninguna empresa
             if (tecnico.getEmpresa() == null && tecnico.getDisponible()) {
