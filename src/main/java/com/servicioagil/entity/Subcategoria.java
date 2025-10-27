@@ -1,7 +1,10 @@
 package com.servicioagil.entity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -12,6 +15,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -167,6 +171,10 @@ public class Subcategoria {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "categoria_id", nullable = false)
     private Categoria categoria;
+
+    // Relación con técnicos (una subcategoría puede tener múltiples técnicos)
+    @OneToMany(mappedBy = "subcategoria", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Tecnico> tecnicos = new ArrayList<>();
 
     // Campos de auditoría
     @Column(name = "fecha_creacion", nullable = false, updatable = false)

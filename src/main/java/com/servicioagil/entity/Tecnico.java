@@ -93,14 +93,10 @@ public class Tecnico {
     @JoinColumn(name = "empresa_id")
     private Empresa empresa;
 
-    // Relación con subcategorías en las que trabaja el técnico
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "tecnico_subcategorias",
-        joinColumns = @JoinColumn(name = "tecnico_id"),
-        inverseJoinColumns = @JoinColumn(name = "subcategoria_id")
-    )
-    private List<Subcategoria> subcategorias = new ArrayList<>();
+    // Relación con subcategoría (un técnico pertenece a una subcategoría)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "subcategoria_id", nullable = false)
+    private Subcategoria subcategoria;
 
     // Relación con reseñas recibidas
     @OneToMany(mappedBy = "tecnico", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -122,6 +118,8 @@ public class Tecnico {
 
     @Column(name = "modificado_por", length = 100)
     private String modificadoPor;
+
+
 
     @PrePersist
     protected void onCreate() {

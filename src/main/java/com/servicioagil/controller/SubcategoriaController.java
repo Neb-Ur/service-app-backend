@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.servicioagil.dto.CreateSubcategoriaDTO;
+import com.servicioagil.dto.SubcategoriaConTecnicosDTO;
 import com.servicioagil.dto.SubcategoriaDTO;
 import com.servicioagil.dto.UpdateSubcategoriaDTO;
 import com.servicioagil.service.SubcategoriaService;
@@ -336,5 +337,19 @@ public class SubcategoriaController {
         response.put("totalPaginas", subcategorias.getTotalPages());
         
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}/tecnicos")
+    @Operation(summary = "Obtener subcategoría con sus técnicos",
+               description = "Retorna una subcategoría con la lista completa de técnicos activos y disponibles asociados a ella")
+    @ApiResponse(responseCode = "200", description = "Subcategoría con técnicos obtenida exitosamente",
+                 content = @Content(mediaType = "application/json"))
+    @ApiResponse(responseCode = "404", description = "Subcategoría no encontrada")
+    public ResponseEntity<SubcategoriaConTecnicosDTO> obtenerSubcategoriaConTecnicos(
+            @Parameter(description = "ID de la subcategoría", required = true)
+            @PathVariable Long id) {
+        log.info("GET /api/subcategorias/{}/tecnicos - Obteniendo subcategoría con técnicos", id);
+        SubcategoriaConTecnicosDTO subcategoria = subcategoriaService.obtenerSubcategoriaConTecnicos(id);
+        return ResponseEntity.ok(subcategoria);
     }
 }

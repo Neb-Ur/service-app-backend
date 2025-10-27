@@ -13,7 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.servicioagil.dto.CreateSubcategoriaDTO;
+import com.servicioagil.dto.SubcategoriaConTecnicosDTO;
 import com.servicioagil.dto.SubcategoriaDTO;
+import com.servicioagil.dto.TecnicoResumenDTO;
 import com.servicioagil.dto.UpdateSubcategoriaDTO;
 import com.servicioagil.entity.Categoria;
 import com.servicioagil.entity.Subcategoria;
@@ -281,6 +283,52 @@ public class SubcategoriaService {
                 altura, domicilio, atencion24h, radioMaximo, tipoPrecio, ratingMinimo, pageable);
         
         return subcategorias.map(this::convertirASubcategoriaDTO);
+    }
+
+    /**
+     * Obtener subcategoría con lista de técnicos
+     */
+    @Transactional(readOnly = true)
+    public SubcategoriaConTecnicosDTO obtenerSubcategoriaConTecnicos(Long id) {
+        log.info("Obteniendo subcategoría con técnicos - ID: {}", id);
+        
+        Subcategoria subcategoria = subcategoriaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Subcategoría no encontrada con id: " + id));
+        
+        SubcategoriaConTecnicosDTO dto = new SubcategoriaConTecnicosDTO();
+        dto.setId(subcategoria.getId());
+        dto.setNombre(subcategoria.getNombre());
+        dto.setDescripcion(subcategoria.getDescripcion());
+        dto.setActivo(subcategoria.getActivo());
+        dto.setOrdenVisualizacion(subcategoria.getOrdenVisualizacion());
+        dto.setColorHexadecimal(subcategoria.getColorHexadecimal());
+        dto.setIcono(subcategoria.getIcono());
+        dto.setCategoriaId(subcategoria.getCategoria().getId());
+        dto.setCategoriaNombre(subcategoria.getCategoria().getNombre());
+        
+        // Mapear técnicos a TecnicoResumenDTO
+        List<TecnicoResumenDTO> tecnicos = subcategoria.getTecnicos().stream()
+                .filter(tecnico -> tecnico.getActivo() && tecnico.getDisponible())
+                .map(tecnico -> {
+                    TecnicoResumenDTO tecnicoDTO = new TecnicoResumenDTO();
+                    tecnicoDTO.setId(tecnico.getId());
+                    tecnicoDTO.setNombre(tecnico.getUsuario().getNombre());
+                    tecnicoDTO.setApellido(""); // El usuario no tiene apellido separado
+                    tecnicoDTO.setEmail(tecnico.getUsuario().getEmail());
+                    tecnicoDTO.setTelefono(""); // Agregar teléfono si existe en usuario
+                    tecnicoDTO.setPromedioCalificacion(tecnico.getRatingPromedio() != null ? tecnico.getRatingPromedio().doubleValue() : 0.0);
+                    tecnicoDTO.setTotalResenas(tecnico.getTotalResenas());
+                    tecnicoDTO.setClasificacion(tecnico.getClasificacion() != null ? tecnico.getClasificacion().toString() : "Sin clasificación");
+                    tecnicoDTO.setDisponible(tecnico.getDisponible());
+                    tecnicoDTO.setActivo(tecnico.getActivo());
+                    return tecnicoDTO;
+                })
+                .collect(Collectors.toList());
+        
+        dto.setTecnicos(tecnicos);
+        
+        log.info("Subcategoría obtenida con {} técnicos activos", tecnicos.size());
+        return dto;
     }
 
     /**

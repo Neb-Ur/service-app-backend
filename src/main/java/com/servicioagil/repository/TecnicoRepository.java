@@ -29,11 +29,15 @@ public interface TecnicoRepository extends JpaRepository<Tecnico, Long> {
     List<Tecnico> findByVerificadoTrue();
     
     // Técnicos por subcategoría
-    @Query("SELECT t FROM Tecnico t JOIN t.subcategorias s WHERE s.id = :subcategoriaId")
+    @Query("SELECT t FROM Tecnico t JOIN t.subcategoria s WHERE s.id = :subcategoriaId")
     List<Tecnico> findBySubcategoriaId(@Param("subcategoriaId") Long subcategoriaId);
     
+    // Técnicos activos por subcategoría
+    @Query("SELECT t FROM Tecnico t JOIN t.subcategoria s WHERE s.id = :subcategoriaId AND t.activo = :activo")
+    List<Tecnico> findBySubcategoriaIdAndActivoTrue(@Param("subcategoriaId") Long subcategoriaId);
+    
     // Búsqueda con filtros
-    @Query("SELECT DISTINCT t FROM Tecnico t LEFT JOIN t.subcategorias s WHERE " +
+    @Query("SELECT DISTINCT t FROM Tecnico t LEFT JOIN t.subcategoria s WHERE " +
            "(:subcategoriaId IS NULL OR s.id = :subcategoriaId) AND " +
            "(:empresaId IS NULL OR t.empresa.id = :empresaId) AND " +
            "(:clasificacion IS NULL OR t.clasificacion = :clasificacion) AND " +
